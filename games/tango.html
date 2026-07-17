@@ -47,6 +47,8 @@
             constructor() {
                 this.size = 6;
                 this.board = [];
+                this.locked = [];
+                this.initialPuzzle = [];
                 this.solution = [];
                 this.moves = 0;
                 this.boardElement = document.getElementById('gameBoard');
@@ -62,7 +64,10 @@
 
             generateNewPuzzle() {
                 this.solution = this.generateSolution();
-                this.board = this.createPuzzle(this.solution);
+                const { puzzle, locked } = this.createPuzzle(this.solution);
+                this.board = puzzle.map(row => [...row]);
+                this.locked = locked.map(row => [...row]);
+                this.initialPuzzle = puzzle.map(row => [...row]);
                 this.moves = 0;
                 this.updateMovesDisplay();
                 this.render();
@@ -158,40 +163,33 @@
 
             createPuzzle(solution) {
                 let puzzle = Array(this.size).fill(null).map(() => Array(this.size).fill(-1));
+                let locked = Array(this.size).fill(null).map(() => Array(this.size).fill(false));
 
                 // Reveal about 40% of the cells
                 for (let i = 0; i < this.size; i++) {
                     for (let j = 0; j < this.size; j++) {
                         if (Math.random() < 0.4) {
                             puzzle[i][j] = solution[i][j];
+                            locked[i][j] = true;
                         }
                     }
                 }
 
-                return puzzle;
+                return { puzzle, locked };
             }
 
             resetBoard() {
-                this.board = this.board.map((row, i) =>
-                    row.map((cell, j) => {
-                        const original = Array(this.size).fill(null).map(() => Array(this.size).fill(-1));
-                        // Find original puzzle state
-                        for (let ri = 0; ri < this.size; ri++) {
-                            for (let rj = 0; rj < this.size; rj++) {
-                                if (Math.random() < 0.4) {
-                                    original[ri][rj] = this.solution[ri][rj];
-                                }
-                            }
-                        }
-                        return original[i][j];
-                    })
-                );
+                this.board = this.initialPuzzle.map(row => [...row]);
                 this.moves = 0;
                 this.updateMovesDisplay();
                 this.render();
             }
 
             toggleCell(row, col) {
+                if (this.locked[row][col]) {
+                    return;
+                }
+
                 let newValue;
                 if (this.board[row][col] === -1) {
                     newValue = 0;
@@ -232,11 +230,16 @@
                             cell.classList.add('moon');
                         }
 
+                        if (this.locked[i][j]) {
+                            cell.classList.add('locked');
+                        } else {
+                            cell.addEventListener('click', () => this.toggleCell(i, j));
+                        }
+
                         if (this.hasThreeConsecutiveAt(i, j)) {
                             cell.classList.add('invalid');
                         }
 
-                        cell.addEventListener('click', () => this.toggleCell(i, j));
                         this.boardElement.appendChild(cell);
                     }
                 }
