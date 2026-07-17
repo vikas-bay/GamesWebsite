@@ -15,6 +15,7 @@
                 <h1>🔤 Zip</h1>
                 <div class="game-buttons">
                     <button class="btn btn-primary" id="generateBtn">Generate New Puzzle</button>
+                    <button class="btn btn-secondary" id="revealBtn">Reveal Answer</button>
                     <button class="btn btn-secondary" id="resetBtn">Reset</button>
                 </div>
             </div>
@@ -76,10 +77,12 @@
                 this.hintElement = document.getElementById('hint');
                 this.currentWordElement = document.getElementById('currentWord');
                 this.generateBtn = document.getElementById('generateBtn');
+                this.revealBtn = document.getElementById('revealBtn');
                 this.resetBtn = document.getElementById('resetBtn');
                 this.clearSelectionBtn = document.getElementById('clearSelectionBtn');
 
                 this.generateBtn.addEventListener('click', () => this.generateNewPuzzle());
+                this.revealBtn.addEventListener('click', () => this.revealAnswer());
                 this.resetBtn.addEventListener('click', () => this.resetBoard());
                 this.clearSelectionBtn.addEventListener('click', () => this.clearSelection());
 
@@ -130,6 +133,31 @@
 
             clearSelection() {
                 this.selectedIndices = [];
+                this.updateDisplay();
+                this.render();
+            }
+
+            revealAnswer() {
+                const positions = [];
+                for (let i = 0; i < this.board.length; i++) {
+                    if (this.board[i] === this.currentWordData.word[positions.length]) {
+                        positions.push(i);
+                    }
+                }
+
+                if (positions.length === 0) {
+                    for (let i = 0; i < this.board.length; i++) {
+                        for (let j = 0; j < this.currentWordData.word.length; j++) {
+                            if (this.board[i] === this.currentWordData.word[j]) {
+                                positions.push(i);
+                                break;
+                            }
+                        }
+                        if (positions.length === this.currentWordData.word.length) break;
+                    }
+                }
+
+                this.selectedIndices = positions;
                 this.updateDisplay();
                 this.render();
             }

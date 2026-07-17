@@ -144,6 +144,7 @@
                 <h1>🔢 Sudoku</h1>
                 <div class="game-buttons">
                     <button class="btn btn-primary" id="generateBtn">Generate New Puzzle</button>
+                    <button class="btn btn-secondary" id="revealBtn">Reveal Answer</button>
                     <button class="btn btn-secondary" id="resetBtn">Reset</button>
                 </div>
             </div>
@@ -191,9 +192,11 @@
                 this.filledCountElement = document.getElementById('filledCount');
                 this.numberPadElement = document.getElementById('numberPad');
                 this.generateBtn = document.getElementById('generateBtn');
+                this.revealBtn = document.getElementById('revealBtn');
                 this.resetBtn = document.getElementById('resetBtn');
 
                 this.generateBtn.addEventListener('click', () => this.generateNewPuzzle());
+                this.revealBtn.addEventListener('click', () => this.revealAnswer());
                 this.resetBtn.addEventListener('click', () => this.resetBoard());
 
                 this.createNumberPad();
@@ -284,6 +287,12 @@
                 this.userBoard = this.board.map(row => [...row]);
                 this.selectedCell = null;
                 this.moves = 0;
+                this.updateDisplay();
+                this.render();
+            }
+
+            revealAnswer() {
+                this.userBoard = this.solution.map(row => [...row]);
                 this.updateDisplay();
                 this.render();
             }

@@ -15,6 +15,7 @@
                 <h1>☀️ Tango 🌙</h1>
                 <div class="game-buttons">
                     <button class="btn btn-primary" id="generateBtn">Generate New Puzzle</button>
+                    <button class="btn btn-secondary" id="revealBtn">Reveal Answer</button>
                     <button class="btn btn-secondary" id="resetBtn">Reset</button>
                 </div>
             </div>
@@ -54,9 +55,11 @@
                 this.boardElement = document.getElementById('gameBoard');
                 this.movesElement = document.getElementById('moves');
                 this.generateBtn = document.getElementById('generateBtn');
+                this.revealBtn = document.getElementById('revealBtn');
                 this.resetBtn = document.getElementById('resetBtn');
 
                 this.generateBtn.addEventListener('click', () => this.generateNewPuzzle());
+                this.revealBtn.addEventListener('click', () => this.revealAnswer());
                 this.resetBtn.addEventListener('click', () => this.resetBoard());
 
                 this.generateNewPuzzle();
@@ -182,6 +185,11 @@
                 this.board = this.initialPuzzle.map(row => [...row]);
                 this.moves = 0;
                 this.updateMovesDisplay();
+                this.render();
+            }
+
+            revealAnswer() {
+                this.board = this.solution.map(row => [...row]);
                 this.render();
             }
 
