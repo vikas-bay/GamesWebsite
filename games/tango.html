@@ -37,7 +37,7 @@
             </div>
 
             <div style="text-align: center; color: #666; margin-top: 20px;">
-                <p>Click cells to toggle between Sun (☀️) and Moon (🌙). Each row and column must have 3 suns and 3 moons.</p>
+                <p><strong>Rules:</strong> Each row and column must have 3 suns and 3 moons. No three consecutive suns or moons in any row or column.</p>
             </div>
         </div>
     </div>
@@ -71,18 +71,27 @@
             generateSolution() {
                 let solution = Array(this.size).fill(null).map(() => Array(this.size).fill(0));
 
-                // Simple generation: alternate pattern with some randomization
+                // Generate alternating pattern
                 for (let i = 0; i < this.size; i++) {
                     for (let j = 0; j < this.size; j++) {
                         solution[i][j] = (i + j) % 2;
                     }
                 }
 
-                // Add some randomization while maintaining valid state
+                // Validate and fix three consecutive violations
                 for (let i = 0; i < this.size; i++) {
                     for (let j = 0; j < this.size - 2; j++) {
-                        if (Math.random() < 0.3) {
-                            this.swapIfValid(solution, i, j, i, j + 1);
+                        if (solution[i][j] === solution[i][j + 1] && solution[i][j] === solution[i][j + 2]) {
+                            solution[i][j + 2] = 1 - solution[i][j + 2];
+                        }
+                    }
+                }
+
+                // Check columns
+                for (let j = 0; j < this.size; j++) {
+                    for (let i = 0; i < this.size - 2; i++) {
+                        if (solution[i][j] === solution[i + 1][j] && solution[i][j] === solution[i + 2][j]) {
+                            solution[i + 2][j] = 1 - solution[i + 2][j];
                         }
                     }
                 }
@@ -94,6 +103,57 @@
                 let temp = board[r1][c1];
                 board[r1][c1] = board[r2][c2];
                 board[r2][c2] = temp;
+            }
+
+            hasThreeConsecutive(board) {
+                for (let i = 0; i < this.size; i++) {
+                    for (let j = 0; j < this.size - 2; j++) {
+                        if (board[i][j] !== -1 && board[i][j] === board[i][j + 1] && board[i][j] === board[i][j + 2]) {
+                            return true;
+                        }
+                    }
+                }
+
+                for (let j = 0; j < this.size; j++) {
+                    for (let i = 0; i < this.size - 2; i++) {
+                        if (board[i][j] !== -1 && board[i][j] === board[i + 1][j] && board[i][j] === board[i + 2][j]) {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            isValidMove(row, col, value) {
+                const temp = this.board[row][col];
+                this.board[row][col] = value;
+                const valid = !this.hasThreeConsecutive(this.board);
+                this.board[row][col] = temp;
+                return valid;
+            }
+
+            hasThreeConsecutiveAt(row, col) {
+                const value = this.board[row][col];
+                if (value === -1) return false;
+
+                for (let j = 0; j < this.size - 2; j++) {
+                    if (col >= j && col < j + 3) {
+                        if (this.board[row][j] !== -1 && this.board[row][j] === this.board[row][j + 1] && this.board[row][j] === this.board[row][j + 2]) {
+                            return true;
+                        }
+                    }
+                }
+
+                for (let i = 0; i < this.size - 2; i++) {
+                    if (row >= i && row < i + 3) {
+                        if (this.board[i][col] !== -1 && this.board[i][col] === this.board[i + 1][col] && this.board[i][col] === this.board[i + 2][col]) {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
             }
 
             createPuzzle(solution) {
@@ -132,13 +192,20 @@
             }
 
             toggleCell(row, col) {
+                let newValue;
                 if (this.board[row][col] === -1) {
-                    this.board[row][col] = 0;
+                    newValue = 0;
                 } else if (this.board[row][col] === 0) {
-                    this.board[row][col] = 1;
+                    newValue = 1;
                 } else {
-                    this.board[row][col] = -1;
+                    newValue = -1;
                 }
+
+                if (!this.isValidMove(row, col, newValue)) {
+                    return;
+                }
+
+                this.board[row][col] = newValue;
                 this.moves++;
                 this.updateMovesDisplay();
                 this.render();
@@ -163,6 +230,10 @@
                         } else if (value === 1) {
                             cell.textContent = '🌙';
                             cell.classList.add('moon');
+                        }
+
+                        if (this.hasThreeConsecutiveAt(i, j)) {
+                            cell.classList.add('invalid');
                         }
 
                         cell.addEventListener('click', () => this.toggleCell(i, j));
