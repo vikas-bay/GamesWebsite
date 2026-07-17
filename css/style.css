@@ -1,0 +1,302 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Landing Page */
+header {
+    text-align: center;
+    color: white;
+    margin-bottom: 50px;
+    padding-top: 30px;
+}
+
+header h1 {
+    font-size: 3.5rem;
+    margin-bottom: 10px;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.subtitle {
+    font-size: 1.3rem;
+    opacity: 0.95;
+    font-weight: 300;
+}
+
+.games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    margin-bottom: 50px;
+}
+
+.game-card {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+}
+
+.game-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+}
+
+.game-icon {
+    font-size: 4rem;
+    margin-bottom: 15px;
+}
+
+.game-card h2 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.game-card p {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 20px;
+    line-height: 1.5;
+    flex-grow: 1;
+}
+
+.play-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.game-card:hover .play-button {
+    transform: scale(1.05);
+}
+
+footer {
+    text-align: center;
+    color: white;
+    opacity: 0.9;
+    padding: 30px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Game Pages */
+.game-container {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.game-header h1 {
+    font-size: 2.5rem;
+    color: #333;
+}
+
+.game-buttons {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background: #e0e0e0;
+}
+
+.game-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.game-board {
+    display: inline-block;
+}
+
+/* Grid Styles */
+.grid {
+    display: inline-grid;
+    gap: 5px;
+    padding: 10px;
+    background: #f5f5f5;
+    border-radius: 10px;
+}
+
+.grid-6x6 {
+    grid-template-columns: repeat(6, 1fr);
+}
+
+.grid-8x8 {
+    grid-template-columns: repeat(8, 1fr);
+}
+
+.cell {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.cell:hover {
+    background: #f9f9f9;
+    border-color: #667eea;
+}
+
+.cell.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+.cell.invalid {
+    background: #ffebee;
+    border-color: #f44336;
+}
+
+.cell.valid {
+    background: #e8f5e9;
+    border-color: #4caf50;
+}
+
+.cell.sun {
+    font-size: 1.5rem;
+}
+
+.cell.moon {
+    font-size: 1.5rem;
+}
+
+.game-info {
+    background: #f5f5f5;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.info-row:last-child {
+    margin-bottom: 0;
+}
+
+/* Back Link */
+.back-link {
+    display: inline-block;
+    margin-bottom: 30px;
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.back-link:hover {
+    color: #764ba2;
+    transform: translateX(-5px);
+}
+
+.back-link::before {
+    content: "← ";
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2.5rem;
+    }
+
+    .games-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .game-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .cell {
+        width: 40px;
+        height: 40px;
+        font-size: 0.9rem;
+    }
+
+    .grid-8x8 {
+        grid-template-columns: repeat(8, 40px);
+    }
+
+    .grid-6x6 {
+        grid-template-columns: repeat(6, 40px);
+    }
+}

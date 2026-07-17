@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queens - Puzzle Game</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .grid-8x8-small {
+            grid-template-columns: repeat(8, 40px);
+        }
+
+        @media (min-width: 768px) {
+            .grid-8x8-small {
+                grid-template-columns: repeat(8, 50px);
+            }
+        }
+
+        .cell.queen {
+            font-size: 1.8rem;
+        }
+
+        .cell.threat {
+            background: #ffcdd2;
+            border-color: #f44336;
+        }
+
+        .cell.safe {
+            background: #c8e6c9;
+            border-color: #4caf50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-link">Back to Games</a>
+
+        <div class="game-container">
+            <div class="game-header">
+                <h1>♛ Queens</h1>
+                <div class="game-buttons">
+                    <button class="btn btn-primary" id="generateBtn">Generate New Puzzle</button>
+                    <button class="btn btn-secondary" id="resetBtn">Reset</button>
+                </div>
+            </div>
+
+            <div class="game-info">
+                <div class="info-row">
+                    <span>Queens Placed:</span>
+                    <strong id="queensCount">0/8</strong>
+                </div>
+                <div class="info-row">
+                    <span>Status:</span>
+                    <strong id="status">Ready</strong>
+                </div>
+                <div class="info-row">
+                    <span>Moves:</span>
+                    <strong id="moves">0</strong>
+                </div>
+            </div>
+
+            <div class="game-content">
+                <div class="game-board">
+                    <div class="grid grid-8x8-small" id="gameBoard"></div>
+                </div>
+            </div>
+
+            <div style="text-align: center; color: #666; margin-top: 20px;">
+                <p>Place 8 queens on the 8x8 board. No two queens can attack each other (same row, column, or diagonal).</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class QueensGame {
+            constructor() {
+                this.size = 8;
+                this.board = Array(this.size).fill(null).map(() => Array(this.size).fill(0));
+                this.moves = 0;
+                this.boardElement = document.getElementById('gameBoard');
+                this.movesElement = document.getElementById('moves');
+                this.queensCountElement = document.getElementById('queensCount');
+                this.statusElement = document.getElementById('status');
+                this.generateBtn = document.getElementById('generateBtn');
+                this.resetBtn = document.getElementById('resetBtn');
+
+                this.generateBtn.addEventListener('click', () => this.generateNewPuzzle());
+                this.resetBtn.addEventListener('click', () => this.resetBoard());
+
+                this.generateNewPuzzle();
+            }
+
+            generateNewPuzzle() {
+                this.board = Array(this.size).fill(null).map(() => Array(this.size).fill(0));
+                this.moves = 0;
+                this.updateDisplay();
+                this.render();
+            }
+
+            resetBoard() {
+                this.board = Array(this.size).fill(null).map(() => Array(this.size).fill(0));
+                this.moves = 0;
+                this.updateDisplay();
+                this.render();
+            }
+
+            toggleCell(row, col) {
+                if (this.board[row][col] === 0) {
+                    this.board[row][col] = 1;
+                } else {
+                    this.board[row][col] = 0;
+                }
+                this.moves++;
+                this.updateDisplay();
+
+                const queensCount = this.countQueens();
+                if (queensCount === this.size && this.isSolved()) {
+                    setTimeout(() => {
+                        alert(`Congratulations! You solved the puzzle in ${this.moves} moves!`);
+                        this.generateNewPuzzle();
+                    }, 100);
+                }
+
+                this.render();
+            }
+
+            countQueens() {
+                let count = 0;
+                for (let i = 0; i < this.size; i++) {
+                    for (let j = 0; j < this.size; j++) {
+                        if (this.board[i][j] === 1) count++;
+                    }
+                }
+                return count;
+            }
+
+            isQueenAtPosition(row, col) {
+                return this.board[row][col] === 1;
+            }
+
+            isCellUnderAttack(row, col) {
+                // Check row
+                for (let j = 0; j < this.size; j++) {
+                    if (j !== col && this.isQueenAtPosition(row, j)) {
+                        return true;
+                    }
+                }
+
+                // Check column
+                for (let i = 0; i < this.size; i++) {
+                    if (i !== row && this.isQueenAtPosition(i, col)) {
+                        return true;
+                    }
+                }
+
+                // Check diagonals
+                for (let i = 0; i < this.size; i++) {
+                    for (let j = 0; j < this.size; j++) {
+                        if ((i !== row || j !== col) && this.isQueenAtPosition(i, j)) {
+                            if (Math.abs(i - row) === Math.abs(j - col)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            isSolved() {
+                const queensCount = this.countQueens();
+                if (queensCount !== this.size) return false;
+
+                for (let i = 0; i < this.size; i++) {
+                    for (let j = 0; j < this.size; j++) {
+                        if (this.isQueenAtPosition(i, j)) {
+                            if (this.isCellUnderAttack(i, j)) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+                return true;
+            }
+
+            updateDisplay() {
+                this.movesElement.textContent = this.moves;
+                const queensCount = this.countQueens();
+                this.queensCountElement.textContent = `${queensCount}/${this.size}`;
+
+                if (queensCount === 0) {
+                    this.statusElement.textContent = 'Ready';
+                    this.statusElement.style.color = '#667eea';
+                } else if (this.isSolved()) {
+                    this.statusElement.textContent = 'Solved!';
+                    this.statusElement.style.color = '#4caf50';
+                } else {
+                    let hasConflict = false;
+                    for (let i = 0; i < this.size; i++) {
+                        for (let j = 0; j < this.size; j++) {
+                            if (this.isQueenAtPosition(i, j) && this.isCellUnderAttack(i, j)) {
+                                hasConflict = true;
+                                break;
+                            }
+                        }
+                        if (hasConflict) break;
+                    }
+                    this.statusElement.textContent = hasConflict ? 'Conflict detected' : 'In progress';
+                    this.statusElement.style.color = hasConflict ? '#f44336' : '#ff9800';
+                }
+            }
+
+            render() {
+                this.boardElement.innerHTML = '';
+
+                for (let i = 0; i < this.size; i++) {
+                    for (let j = 0; j < this.size; j++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'cell';
+
+                        // Checkerboard pattern
+                        if ((i + j) % 2 === 0) {
+                            cell.style.backgroundColor = '#f5f5f5';
+                        }
+
+                        if (this.isQueenAtPosition(i, j)) {
+                            cell.textContent = '♛';
+                            cell.classList.add('queen');
+                            if (this.isCellUnderAttack(i, j)) {
+                                cell.classList.add('threat');
+                            } else {
+                                cell.classList.add('safe');
+                            }
+                        } else {
+                            if (this.isCellUnderAttack(i, j)) {
+                                cell.classList.add('threat');
+                            }
+                        }
+
+                        cell.addEventListener('click', () => this.toggleCell(i, j));
+                        this.boardElement.appendChild(cell);
+                    }
+                }
+            }
+        }
+
+        window.addEventListener('load', () => {
+            new QueensGame();
+        });
+    </script>
+</body>
+</html>

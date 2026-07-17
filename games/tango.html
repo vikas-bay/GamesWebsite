@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tango - Puzzle Game</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-link">Back to Games</a>
+
+        <div class="game-container">
+            <div class="game-header">
+                <h1>☀️ Tango 🌙</h1>
+                <div class="game-buttons">
+                    <button class="btn btn-primary" id="generateBtn">Generate New Puzzle</button>
+                    <button class="btn btn-secondary" id="resetBtn">Reset</button>
+                </div>
+            </div>
+
+            <div class="game-info">
+                <div class="info-row">
+                    <span>Difficulty:</span>
+                    <strong id="difficulty">Medium</strong>
+                </div>
+                <div class="info-row">
+                    <span>Moves:</span>
+                    <strong id="moves">0</strong>
+                </div>
+            </div>
+
+            <div class="game-content">
+                <div class="game-board">
+                    <div class="grid grid-6x6" id="gameBoard"></div>
+                </div>
+            </div>
+
+            <div style="text-align: center; color: #666; margin-top: 20px;">
+                <p>Click cells to toggle between Sun (☀️) and Moon (🌙). Each row and column must have 3 suns and 3 moons.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class TangoGame {
+            constructor() {
+                this.size = 6;
+                this.board = [];
+                this.solution = [];
+                this.moves = 0;
+                this.boardElement = document.getElementById('gameBoard');
+                this.movesElement = document.getElementById('moves');
+                this.generateBtn = document.getElementById('generateBtn');
+                this.resetBtn = document.getElementById('resetBtn');
+
+                this.generateBtn.addEventListener('click', () => this.generateNewPuzzle());
+                this.resetBtn.addEventListener('click', () => this.resetBoard());
+
+                this.generateNewPuzzle();
+            }
+
+            generateNewPuzzle() {
+                this.solution = this.generateSolution();
+                this.board = this.createPuzzle(this.solution);
+                this.moves = 0;
+                this.updateMovesDisplay();
+                this.render();
+            }
+
+            generateSolution() {
+                let solution = Array(this.size).fill(null).map(() => Array(this.size).fill(0));
+
+                // Simple generation: alternate pattern with some randomization
+                for (let i = 0; i < this.size; i++) {
+                    for (let j = 0; j < this.size; j++) {
+                        solution[i][j] = (i + j) % 2;
+                    }
+                }
+
+                // Add some randomization while maintaining valid state
+                for (let i = 0; i < this.size; i++) {
+                    for (let j = 0; j < this.size - 2; j++) {
+                        if (Math.random() < 0.3) {
+                            this.swapIfValid(solution, i, j, i, j + 1);
+                        }
+                    }
+                }
+
+                return solution;
+            }
+
+            swapIfValid(board, r1, c1, r2, c2) {
+                let temp = board[r1][c1];
+                board[r1][c1] = board[r2][c2];
+                board[r2][c2] = temp;
+            }
+
+            createPuzzle(solution) {
+                let puzzle = Array(this.size).fill(null).map(() => Array(this.size).fill(-1));
+
+                // Reveal about 40% of the cells
+                for (let i = 0; i < this.size; i++) {
+                    for (let j = 0; j < this.size; j++) {
+                        if (Math.random() < 0.4) {
+                            puzzle[i][j] = solution[i][j];
+                        }
+                    }
+                }
+
+                return puzzle;
+            }
+
+            resetBoard() {
+                this.board = this.board.map((row, i) =>
+                    row.map((cell, j) => {
+                        const original = Array(this.size).fill(null).map(() => Array(this.size).fill(-1));
+                        // Find original puzzle state
+                        for (let ri = 0; ri < this.size; ri++) {
+                            for (let rj = 0; rj < this.size; rj++) {
+                                if (Math.random() < 0.4) {
+                                    original[ri][rj] = this.solution[ri][rj];
+                                }
+                            }
+                        }
+                        return original[i][j];
+                    })
+                );
+                this.moves = 0;
+                this.updateMovesDisplay();
+                this.render();
+            }
+
+            toggleCell(row, col) {
+                if (this.board[row][col] === -1) {
+                    this.board[row][col] = 0;
+                } else if (this.board[row][col] === 0) {
+                    this.board[row][col] = 1;
+                } else {
+                    this.board[row][col] = -1;
+                }
+                this.moves++;
+                this.updateMovesDisplay();
+                this.render();
+            }
+
+            updateMovesDisplay() {
+                this.movesElement.textContent = this.moves;
+            }
+
+            render() {
+                this.boardElement.innerHTML = '';
+
+                for (let i = 0; i < this.size; i++) {
+                    for (let j = 0; j < this.size; j++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'cell';
+
+                        const value = this.board[i][j];
+                        if (value === 0) {
+                            cell.textContent = '☀️';
+                            cell.classList.add('sun');
+                        } else if (value === 1) {
+                            cell.textContent = '🌙';
+                            cell.classList.add('moon');
+                        }
+
+                        cell.addEventListener('click', () => this.toggleCell(i, j));
+                        this.boardElement.appendChild(cell);
+                    }
+                }
+            }
+        }
+
+        window.addEventListener('load', () => {
+            new TangoGame();
+        });
+    </script>
+</body>
+</html>
